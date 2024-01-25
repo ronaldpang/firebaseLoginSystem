@@ -20,7 +20,7 @@ var firebaseConfig = {
     full_name = document.getElementById('full_name').value
     favourite_song = document.getElementById('favourite_song').value
     milk_before_cereal = document.getElementById('milk_before_cereal').value
-  
+
     // Validate input fields
     if (validate_email(email) == false || validate_password(password) == false) {
       alert('Email or Password is Outta Line!!')
@@ -40,6 +40,12 @@ var firebaseConfig = {
   
       // Add this user to Firebase Database
       var database_ref = database.ref()
+
+      //Get current date and time
+      const currentDate = new Date()
+      const centralOffset = -6 * 60 // Central Time is UTC-6
+      currentDate.setMinutes(currentDate.getMinutes() - centralOffset);
+      const formattedDate = currentDate.toISOString()
   
       // Create User data
       var user_data = {
@@ -47,7 +53,8 @@ var firebaseConfig = {
         full_name : full_name,
         favourite_song : favourite_song,
         milk_before_cereal : milk_before_cereal,
-        last_login : Date.now()
+        timestamp: formattedDate
+        // last_login : Date.now()
       }
   
       // Push to Firebase Database
@@ -73,7 +80,7 @@ var firebaseConfig = {
   
     // Validate input fields
     if (validate_email(email) == false || validate_password(password) == false) {
-      alert('Email or Password is Outta Line!!')
+      alert('Invalid Login credentials. Please ensure the correct email and password is being entered')
       return
       // Don't continue running the code
     }
@@ -108,8 +115,6 @@ var firebaseConfig = {
   }
   
   
-  
-  
   // Validate Functions
   function validate_email(email) {
     expression = /^[^@]+@\w+(\.\w+)+\w$/
@@ -123,11 +128,13 @@ var firebaseConfig = {
   }
   
   function validate_password(password) {
-    // Firebase only accepts lengths greater than 6
-    if (password < 6) {
-      return false
-    } else {
+    // Firebase only accepts at least one lowercase letter, one uppercase letter,
+    // one digit, and one special character. The password should be at least 8 characters long
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    if (passwordRegex.test(password) == true){
       return true
+    } else {
+      return false
     }
   }
   
